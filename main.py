@@ -1,4 +1,4 @@
-from prem import *
+from stats import *
 import json
 import requests
 
