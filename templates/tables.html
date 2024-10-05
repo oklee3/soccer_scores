@@ -1,0 +1,46 @@
+<!-- templates/tables.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Football League Tables</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='tables_style.css') }}">
+</head>
+<body>
+    <h1>Big 5 European League Tables</h1>
+    {% for table in tables %}
+        <h2>{{ table.league }}</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Club</th>
+                    <th>MP</th>
+                    <th>W</th>
+                    <th>D</th>
+                    <th>L</th>
+                    <th>Pts</th>
+                    <th>GD</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for team in table.teams %}
+                    <tr>
+                        <td>{{ team['Pos'] }}</td>
+                        <td>{{ team['Club'] }} <img src="{{ team_crests[team['Club']] }}" alt="Club Crest" style="width:20px;height:20px;vertical-align:middle;"></td>
+                        <td>{{ team['MP'] }}</td>
+                        <td>{{ team['W'] }}</td>
+                        <td>{{ team['D'] }}</td>
+                        <td>{{ team['L'] }}</td>
+                        <td>{{ team['Pts'] }}</td>
+                        <td>{{ team['GD'] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
+</body>
+</html>
+
