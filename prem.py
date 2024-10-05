@@ -1,11 +1,5 @@
 import requests
 
-# Replace with your own API key
-API_KEY = 'YOUR_API_KEY'
-
-# Headers for authentication
-headers = {'X-Auth-Token': API_KEY}
-
 def get_current_matchday(headers, league_ID):
     """
     Fetches the current matchday for the given league
@@ -20,11 +14,11 @@ def get_current_matchday(headers, league_ID):
 
 def get_latest_league_scores(headers, league_ID):
     """
-    Function that generates scores from the most recent league matchweek.
+    Function that returns the scores from the most recent league matchweek.
     When a new matchweek begins, the batch of scores is updated.
+    Returns a list containing each team as a dictionary.
     """
     current_matchday = get_current_matchday(headers, league_ID)
-
     url = f'https://api.football-data.org/v4/competitions/{league_ID}/matches?matchday={current_matchday}'
 
     response = requests.get(url, headers=headers)
@@ -33,40 +27,50 @@ def get_latest_league_scores(headers, league_ID):
         data = response.json()
 
         if not data['matches']:
-            print(f"No matches found for Matchday {current_matchday}.")  # If no matches found
-            return
+            return f"No matches found for Matchday {current_matchday}."  # Return a message if no matches found
+
+        scores = []
 
         for match in data['matches']:
-            home_team = match['homeTeam']['name']
-            away_team = match['awayTeam']['name']
-            home_score = match['score']['fullTime']['home']
-            away_score = match['score']['fullTime']['away']
-            match_date = match['utcDate']
+            match_info = {
+                'Date': match['utcDate'],
+                'Home Team': match['homeTeam']['name'],
+                'Away Team': match['awayTeam']['name'],
+                'Home Score': match['score']['fullTime']['home'],
+                'Away Score': match['score']['fullTime']['away']
+            }
+            scores.append(match_info)
 
-            print(f"{match_date}: {home_team} {home_score} - {away_score} {away_team}")
+        return scores
+    else:
+        return None
 
 def get_table(headers, league_ID):
     """
-    Function that prints the current league table
+    Function that returns the current league table as a list of dictionaries.
     """
     url = f'https://api.football-data.org/v4/competitions/{league_ID}/standings'
-
     response = requests.get(url, headers=headers)
 
     if response.status_code == 200:
         data = response.json()
-
-        print(f"{'Position':<10}{'Team':<30}{'Points':<10}{'Wins':<10}{'Draws':<10}{'Losses':<10}{'Goal Difference':<15}")
-        print("=" * 95)
+        table = []
 
         for standing in data['standings']:
             for team in standing['table']:
-                pos = team['position']
-                name = team['team']['name']
-                points = team['points']
-                wins = team['won']
-                draws = team['draw']
-                losses = team['lost']
-                goal_diff = team['goalDifference']
+                team_info = {
+                    'Pos': team['position'],
+                    'Club': team['team']['name'],
+                    'Crest': team['team']['crest'],
+                    'MP': team['playedGames'],
+                    'W': team['won'],
+                    'D': team['draw'],
+                    'L': team['lost'],
+                    'Pts': team['points'],
+                    'GD': team['goalDifference']
+                }
+                table.append(team_info)
 
-                print(f"{pos:<10}{name:<30}{points:<10}{wins:<10}{draws:<10}{losses:<10}{goal_diff:<15}")
+        return table
+    else:
+        return None
